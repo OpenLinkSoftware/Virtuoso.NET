@@ -196,13 +196,9 @@
 
 
     string appName = "BlazorExampleClient";
-    string[] redirectUris = new string[1] { "https://localhost:7030/loginoidc" };
+    string[] redirectUris = new string[1] { "http://localhost:7030/loginoidc" };
     bool useDebug = true;
 
-    static string cardUrl = "http://localhost:3000/profile/card#me";
-    static string cardUrlNoAnchor = "http://localhost:3000/profile/card";
-    string oldName = string.Empty;
-    string currentName = string.Empty;
     string webidName = string.Empty;
     string custom_URI = string.Empty;
     string connState = string.Empty;
