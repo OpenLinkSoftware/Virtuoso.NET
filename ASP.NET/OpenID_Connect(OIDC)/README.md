@@ -21,3 +21,5 @@ The example demonstrates:
  - Logout OIDC
  - execute SPARQL Insert or upload TTL data to SOLID Pod
 
+
+The example requres VS2022 or above.
