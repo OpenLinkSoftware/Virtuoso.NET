@@ -1,0 +1,431 @@
+﻿@page "/loginoidc"
+@using Microsoft.Net.Http.Headers
+@using System.Diagnostics
+@using System.Text
+@using OpenLink
+@inject NavigationManager navigation
+
+<style>
+    .idp-list {
+        display: grid;
+        grid-template-rows: 1fr;
+        grid-template-columns: 350px 350px;
+        grid-gap: 5px;
+    }
+
+    .custom_grp {
+        display: flex;
+
+    }
+
+    .custom_fld {
+        width: 340px;
+        margin: .5em;
+    }
+
+    .custom_btn {
+        margin: .5em;
+    }
+
+    .idp {
+      flex: 1 200px;
+      margin: .5em;
+
+      border: none;
+      border-radius: 2px;
+      padding: .5em;
+      background-color: rgb(61, 109, 211);
+      color: #fff;
+
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: background-color 0.4s, box-shadow 0.4s;
+    }
+
+    .content {
+        height: 250px;
+    }
+
+    .mtab {
+        height: 200px
+    }
+
+</style>
+
+<h3>LoginWithOIDC</h3>
+
+<p>
+    <div class="custom_grp">
+        <input type="url" class="custom_fld" placeholder="https://my-identity.provider" value="@custom_URI">
+        <button type="button" class="custom_btn" @onclick="LoginToCustom">Log In</button>
+    </div>
+
+    <div class="idp-list">
+        <button type="button" class="idp" @onclick="LoginToSolid_Community">
+            Solid Community
+        </button>
+<!--
+        <button type="button" class="idp" @onclick="LoginToSolid_Inrupt">
+            Inrupt Pod Spaces
+        </button>
+-->
+        <button type="button" class="idp" @onclick="LoginToSolid_8444">
+            Login To OpenLink WebID-OIDC
+        </button>
+        <button type="button" class="idp" @onclick="LoginToSolid_8445">
+            Login To OpenLink Solid Server ver:5.1
+        </button>
+        <button type="button" class="idp" @onclick="LoginToSolid_8443">
+            Login To OpenLink Solid Server ver:5.6
+        </button>
+        <button type="button" class="idp" @onclick="LoginToOPL_ODS_QA">
+            OpenLink Data Spaces (QA server)
+        </button>
+        <button type="button" class="idp" @onclick="LoginToURIBurner">
+            Login To OpenLink URIBurner Service
+        </button>
+        <button type="button" class="idp" @onclick="LoginToOPL_MY">
+            OpenLink Identity Provider
+        </button>
+        <button type="button" class="idp" @onclick="LoginToOPL_ID">
+            ID MyOpenLink.NET
+        </button>
+    </div>
+
+</p>
+
+<p>
+    <label>
+        WebID:
+        <span></span><input style="width:500px" value="@webidName" readonly/>  <label> @connState </label> <span/>
+    </label>
+</p>
+
+<p>
+    <button class="btn btn-primary" @onclick="Logout">Logout</button>
+</p>
+
+<hr>
+
+    <div class="content">
+      <ul class="tabs" role="tablist">
+        <li id="tab-sparql" >
+          <input type="radio" name="tabs" id="itab-sparql" checked />
+          <label for="itab-sparql" role="tab" aria-selected="true" tabindex="0" 
+                 title="SPARQL service" >
+            SPARQL
+          </label>
+          <div id="sparql_items" class="tab-content mtab" role="tabpanel" aria-hidden="false">
+              <table>
+                  <tr>
+                      <td>
+                          <label style="background:white">Triple:</label>
+                      </td>
+                      <td style="width:400px;">
+                          <input type="text" style="width:100%;" value="@ui_sparql_triple" @onchange="@((ChangeEventArgs __e) => ui_sparql_triple = __e?.Value?.ToString())" />
+                      </td>
+                  </tr>
+                    <tr>
+                        <td>
+                            <label style="background:white">Graph Name:</label>
+                        </td>
+                        <td>
+                            <input type="url" style="width:100%;" value="@ui_graph" @onchange="@((ChangeEventArgs __e) => ui_graph = __e?.Value?.ToString())" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <label style="background:white">Sparql Endpoint:</label>
+                        </td>
+                        <td>
+                            <input type="url" style="width:100%;" value="@ui_sparql_ep" @onchange="@((ChangeEventArgs __e) => ui_sparql_ep = __e?.Value?.ToString())" />
+                        </td>
+                    </tr>
+                </table>
+
+                <span> <button class="btn btn-primary" @onclick="Insert_Sparql">Insert</button> <div> @ui_sparql_status </div> </span>
+          </div>
+        </li>
+
+
+        <li id="tab-solid">
+          <input type="radio" name="tabs" id="itab-solid" />
+          <label for="itab-solid" role="tab" aria-selected="false" tabindex="0"
+                 title="Solid Pod" >
+            SOLID
+          </label>
+          <div id="solid_items" class="tab-content mtab" role="tabpanel" aria-hidden="true">
+              <table>
+                  <tr>
+                      <td>
+                          <label style="background:white">Triple:</label>
+                      </td>
+                      <td style="width:400px;">
+                          <input type="text" style="width:100%;" value="@ui_solid_triple" @onchange="@((ChangeEventArgs __e) => ui_solid_triple = __e?.Value?.ToString())" />
+                      </td>
+                  </tr>
+                    <tr>
+                        <td>
+                            <label style="background:white">Document Name:</label>
+                        </td>
+                        <td>
+                            <input type="url" style="width:100%;" value="@ui_document" @onchange="@((ChangeEventArgs __e) => ui_document = __e?.Value?.ToString())" />
+                        </td>
+                    </tr>
+                </table>
+
+                <span> <button class="btn btn-primary" @onclick="Insert_Solid">Insert</button>  <div> @ui_solid_status </div> </span>
+          </div>
+        </li>
+
+
+      </ul>
+     </div>
+
+
+
+@code {
+    string ui_sparql_triple = ":s2 :p2 :o2 .";
+    string ui_solid_triple = ":s2 :p2 :o2 .";
+    string ui_graph = "urn:records:test1";
+    string ui_sparql_ep = "https://myidp/sparql";
+    string ui_document = "https://test.ttl";
+    string ui_sparql_status = string.Empty;
+    string ui_solid_status = string.Empty;
+
+
+    string appName = "BlazorExampleClient";
+    string[] redirectUris = new string[1] { "https://localhost:7030/loginoidc" };
+    bool useDebug = true;
+
+    static string cardUrl = "http://localhost:3000/profile/card#me";
+    static string cardUrlNoAnchor = "http://localhost:3000/profile/card";
+    string oldName = string.Empty;
+    string currentName = string.Empty;
+    string webidName = string.Empty;
+    string custom_URI = string.Empty;
+    string connState = string.Empty;
+    static Oidc oidc = new Oidc();
+
+
+
+    string idp;
+
+    private async Task LoginTo(string idp_url)
+    {
+        idp = idp_url;
+
+        // before we login, we need to use Dynamic Client Registration to identify ourselves to the Solid Server
+        await oidc.RegisterAppAsync(idp, redirectUris, appName);
+
+        // generate the login url and save values as needed, sending us back to this page when we're done logging in
+        var url = oidc.GetLoginUrl(redirectUris.First());
+
+        navigation.NavigateTo(url);
+    }
+
+
+    private async Task LoginToCustom()
+    {
+        LoginTo(custom_URI);
+    }
+
+    private async Task LoginToURIBurner()
+    {
+        LoginTo("https://linkeddata.uriburner.com");
+    }
+
+    private async Task LoginToSolid_8444()
+    {
+        LoginTo("https://solid.openlinksw.com:8444");
+    }
+
+    private async Task LoginToSolid_8445()
+    {
+        LoginTo("https://solid.openlinksw.com:8445");
+    }
+
+    private async Task LoginToSolid_8443()
+    {
+        LoginTo("https://solid.openlinksw.com:8443");
+    }
+
+    private async Task LoginToSolid_Community()
+    {
+        LoginTo("https://solidcommunity.net");
+    }
+
+    private async Task LoginToSolid_Inrupt()
+    {
+        LoginTo("https://broker.pod.inrupt.com");
+    }
+
+    private async Task LoginToOPL_ODS_QA()
+    {
+        LoginTo("https://ods-qa.openlinksw.com");
+    }
+
+    private async Task LoginToOPL_ID()
+    {
+        LoginTo("https://id.myopenlink.net");
+    }
+
+    private async Task LoginToOPL_MY()
+    {
+        LoginTo("https://my.openlinksw.com");
+    }
+
+    private async Task Logout()
+    {
+        string url = oidc.GetLogoutUrl(redirectUris.First());
+        if (!string.IsNullOrEmpty(url))
+            navigation.NavigateTo(url);
+    }
+
+    private async Task Insert_Sparql()
+    {
+        string cmd =
+                "PREFIX schema: <http://schema.org/>\n"
+                + "PREFIX : <" + ui_graph + "#>\n"
+                + "PREFIX foaf: <http://xmlns.com/foaf/0.1/>\n"
+                + "INSERT INTO GRAPH <" + ui_graph + "> \n{\n"
+                + ui_sparql_triple + " \n"
+                + "}";
+
+        string url = ui_sparql_ep;
+        ui_sparql_status = "";
+
+
+        using (var client = new HttpClient())
+        {
+            string authToken = "Bearer " + oidc.CreatePopToken(url);
+
+            client.DefaultRequestHeaders.Clear();
+
+            var stringContent = new StringContent(cmd);
+            var request = new HttpRequestMessage(HttpMethod.Post, url);
+
+            request.Content = stringContent;
+            request.Content.Headers.Clear();
+
+            // specify that this is a sparql statement
+            request.Content.Headers.Add("content-type", "application/sparql-update; charset=UTF-8");
+
+            request.Headers.Add("authorization", authToken);
+            request.Headers.Add("credentials", "include");
+
+            request.Headers.Add("credentials", "include");
+            request.Headers.Add("mode", "cors");
+            request.Headers.Add("crossDomain", "true");
+
+            DebugOut(request.ToString());
+            DebugOut(cmd);
+
+            try
+            {
+                var response = await client.SendAsync(request);
+                DebugOut(response.StatusCode.ToString());
+                ui_sparql_status = " Inserted with: " + response.StatusCode.ToString();
+            }
+            catch (HttpRequestException ex)
+            {
+                DebugOut(ex.ToString());
+                ui_sparql_status = " Error: " + ex.ToString();
+            }
+        }
+    }
+
+
+    private async Task Insert_Solid()
+    {
+        string cmd = "INSERT DATA {@prefix : <" + ui_document + "#> . " + ui_solid_triple + " } ";
+        string url = ui_document;
+        ui_solid_status = string.Empty;
+
+        using (var client = new HttpClient())
+        {
+            string authToken = "Bearer "+oidc.CreatePopToken(url);
+
+            client.DefaultRequestHeaders.Clear();
+
+            var stringContent = new StringContent(cmd);
+            var request = new HttpRequestMessage(HttpMethod.Patch, url);
+
+            request.Content = stringContent;
+            request.Content.Headers.Clear();
+
+            // specify that this is a sparql statement
+            request.Content.Headers.Add("content-type", "application/sparql-update; charset=UTF-8"); 
+
+            request.Headers.Add("authorization", authToken);
+            request.Headers.Add("credentials", "include");
+
+            request.Headers.Add("credentials", "include");
+            request.Headers.Add("mode", "cors");
+            request.Headers.Add("crossDomain", "true");
+
+            DebugOut(request.ToString());
+            DebugOut(cmd);
+
+            try
+            {
+                var response = await client.SendAsync(request);
+                DebugOut(response.StatusCode.ToString());
+                ui_solid_status = " Inserted with: " + response.StatusCode.ToString();
+            }
+            catch (HttpRequestException ex)
+            {
+                DebugOut(ex.ToString());
+                ui_solid_status = " Error: " + ex.ToString();
+            }
+        }
+    }
+
+
+    protected async override void OnInitialized()
+    {
+        GetQueryStringValues();
+        navigation.LocationChanged += HandleLocationChanged;
+    }
+
+    void GetQueryStringValues()
+    {
+        // when we're redirected back from the Solid Server after the user logs in, we're given access_token and IDtoken from login that we need to get tokens
+        // so let's save that
+        string fragment;
+        var rc = navigation.TryGetFragment(out fragment);
+        if (rc) 
+        {
+            try {
+                oidc.SetAccessAndIdToken(fragment);
+                webidName = oidc.Client_WebID;
+
+                var uri = new Uri(webidName);
+                ui_sparql_ep = oidc.IdentityProviderUrl + "/sparql";
+                ui_document = uri.Scheme + "://" + uri.Authority + "/public/test.ttl";
+
+            } catch (Exception ex) {
+                DebugOut(ex.ToString());
+            }
+        }
+       connState = (string.IsNullOrEmpty(webidName)) ? "Disconnected" : "Connected";
+    }
+
+    void HandleLocationChanged(object sender, LocationChangedEventArgs e)
+    {
+        GetQueryStringValues();
+        StateHasChanged();
+    }
+
+
+    private void DebugOut(string item)
+    {
+        if (useDebug)
+        {
+            Console.WriteLine(item);
+            Debug.WriteLine(item);
+        }
+    }
+
+}
