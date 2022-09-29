@@ -1,6 +1,6 @@
 # Overview for Auth_OIDC Example
 
-An example Blazor Server Application leveraging OIDC to login to the:
+[Blazor Application](https://learn.microsoft.com/en-us/aspnet/core/blazor/?view=aspnetcore-6.0) example for leveraging OpenID Connect (OIDC) for session login and logout using the following OpenID Connect compliant Identity Providers:
 
 1. Solid Community Server's 
     - https://solidcommunity.net
