@@ -19,7 +19,7 @@
 The example demonstrates:
  - Login OIDC
  - Logout OIDC
- - Data Uploads using SPARQL Insert or direct RDF-Turtle uploads to a SOLID Pod
+ - Data Uploads using SPARQL INSERT or via RDF-Turtle uploads to a SOLID Pod
 
 
 The example requres VS2022 or above.
