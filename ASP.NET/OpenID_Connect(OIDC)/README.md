@@ -19,7 +19,7 @@
 The example demonstrates:
  - Login OIDC
  - Logout OIDC
- - execute SPARQL Insert or upload TTL data to SOLID Pod
+ - Data Uploads using SPARQL Insert or direct RDF-Turtle uploads to a SOLID Pod
 
 
 The example requres VS2022 or above.
