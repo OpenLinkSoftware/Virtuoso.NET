@@ -195,7 +195,7 @@
     string ui_solid_status = string.Empty;
 
 
-    string appName = "BlazorExampleClient";
+    string clientName = "BlazorExampleClient";
     string[] redirectUris = new string[1] { "http://localhost:7030/loginoidc" };
     bool useDebug = true;
 
@@ -213,7 +213,7 @@
         idp = idp_url;
 
         // before we login, we need to use Dynamic Client Registration to identify ourselves to the Solid Server
-        await oidc.RegisterAppAsync(idp, redirectUris, appName);
+        await oidc.RegisterAppAsync(idp, redirectUris, clientName);
 
         // generate the login url and save values as needed, sending us back to this page when we're done logging in
         var url = oidc.GetLoginUrl(redirectUris.First());
@@ -309,9 +309,6 @@
             request.Content.Headers.Add("content-type", "application/sparql-update; charset=UTF-8");
 
             request.Headers.Add("authorization", authToken);
-            request.Headers.Add("credentials", "include");
-
-            request.Headers.Add("credentials", "include");
             request.Headers.Add("mode", "cors");
             request.Headers.Add("crossDomain", "true");
 
@@ -355,9 +352,6 @@
             request.Content.Headers.Add("content-type", "application/sparql-update; charset=UTF-8"); 
 
             request.Headers.Add("authorization", authToken);
-            request.Headers.Add("credentials", "include");
-
-            request.Headers.Add("credentials", "include");
             request.Headers.Add("mode", "cors");
             request.Headers.Add("crossDomain", "true");
 
