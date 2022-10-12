@@ -23,7 +23,7 @@ namespace OpenLink
         private bool _hasGeneratedKeys = false;
         private string _identityProviderUrl = string.Empty;
         private HttpClient _client;
-        private string _appName;
+        private string _clientName;
         private string _appScopes = "openid profile"; // offline_access webid";
         private bool _useDebug = true;
         private string[] _redirectUris;
@@ -53,6 +53,7 @@ namespace OpenLink
         public string Access_Token => _clientAccessToken;
         public string Client_Token => _clientIdToken;
         public string Client_WebID => _client_webId;
+        public string ClientName => _clientName;
 #endregion
 
 #region Constructors
@@ -315,68 +316,26 @@ namespace OpenLink
             await RegisterAppAsync(redirectUris, appName); //rp.register
         }
 
-        public async Task<bool> RegisterAppAsync(string[] redirectUris, string appName)
+        public async Task<bool> RegisterAppAsync(string[] redirectUris, string clientName)
         {
-            if (string.IsNullOrEmpty(_appName))
-            {
-                _appName = appName;
-            }
-
+            _clientName = clientName;
             _redirectUris = redirectUris;
 
             string url = _endpointInfo.registration_endpoint;
             string issuer = _endpointInfo.issuer;
 
-            var contentBuilder = new StringBuilder();
-            contentBuilder.Append("{");
-            contentBuilder.Append(@"""application_type"": ""web"",");
-            contentBuilder.Append(@"""redirect_uris"":[");
+            var _params = new Dictionary<string, object>();
+            _params.Add("application_type", "web");
+            _params.Add("redirect_uris", redirectUris);
+            _params.Add("post_logout_redirect_uris", redirectUris);
+            _params.Add("client_name", _clientName);
+            _params.Add("scopes", _appScopes);
+            _params.Add("grant_types", new string[1] { _grant_types });
+            _params.Add("issuer", issuer);
+            _params.Add("response_types", new string[1] { _response_types });
+            var json_str = JsonConvert.SerializeObject(_params);
 
-            if (redirectUris.Length == 1)
-            {
-                contentBuilder.Append($@"""{redirectUris.First()}""");
-            }
-            else
-            {
-                foreach (var uri in redirectUris)
-                {
-                    contentBuilder.Append($@"""{uri}""");
-                    if (redirectUris.Last() != uri)
-                    {
-                        contentBuilder.Append(",");
-                    }
-                }
-            }
-            contentBuilder.Append("],");
-            
-            contentBuilder.Append(@"""post_logout_redirect_uris"":[");
-
-            if (redirectUris.Length == 1)
-            {
-                contentBuilder.Append($@"""{redirectUris.First()}""");
-            }
-            else
-            {
-                foreach (var uri in redirectUris)
-                {
-                    contentBuilder.Append($@"""{uri}""");
-                    if (redirectUris.Last() != uri)
-                    {
-                        contentBuilder.Append(",");
-                    }
-                }
-            }
-            contentBuilder.Append("],");
-            //            contentBuilder.Append($@"""client_name"": ""{appName}"",");
-            contentBuilder.Append($@"""scopes"": ""{_appScopes}"",");
-
-            contentBuilder.Append($@"""grant_types"": [""{_grant_types}""],");
-            contentBuilder.Append($@"""issuer"": ""{issuer}"",");
-            contentBuilder.Append($@"""response_types"": [""{_response_types}""]");
-
-            contentBuilder.Append("}");
-
-            var stringContent = new StringContent(contentBuilder.ToString(), Encoding.UTF8, "application/json");
+            var stringContent = new StringContent(json_str, Encoding.UTF8, "application/json");
             var request = new HttpRequestMessage(HttpMethod.Post, url);
             request.Content = stringContent;
             var response = await _client.SendAsync(request);
