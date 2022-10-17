@@ -1,0 +1,38 @@
+﻿<Window x:Class="AdoNetDemo.Connection"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:AdoNetDemo"
+        mc:Ignorable="d"
+        Title="Connection" Height="230" Width="400" WindowStartupLocation="CenterScreen" Topmost="True" ResizeMode="NoResize">
+    <StackPanel Orientation="Vertical">
+        <GroupBox>
+            <Grid ShowGridLines="False">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="200*"/>
+                </Grid.ColumnDefinitions>
+
+                <Label Name="Label1" Content="Server" Grid.Column="0" Grid.Row="0" HorizontalAlignment="Right"  />
+                <TextBox Name="fHost"  Height="23" TextWrapping="Wrap" Grid.Column="1" Grid.Row="0" Margin="5,5,5,5"/>
+
+                <Label Name="Label2" Content="Database" Grid.Column="0" Grid.Row="1" HorizontalAlignment="Right"  />
+                <TextBox x:Name="fDatabase"  Height="23" TextWrapping="Wrap" Grid.Column="1" Grid.Row="1" Margin="5,5,5,5"/>
+
+                <Label Name="Label3" Content="Username" Grid.Column="0" Grid.Row="2" HorizontalAlignment="Right"  />
+                <TextBox x:Name="fUID"  Height="23" TextWrapping="Wrap" Grid.Column="1" Grid.Row="2" Margin="5,5,5,5"/>
+
+                <Label Name="Label4" Content="Password" Grid.Column="0" Grid.Row="3" HorizontalAlignment="Right"  />
+                <PasswordBox x:Name="fPWD" Height="23" Grid.Column="1" Grid.Row="3" Margin="5,5,5,5" />
+            </Grid>
+        </GroupBox>
+        <Button Name="Connect" Content="Connect" Height="22" FontSize="13" FontFamily="Calibri"  Width="129" Click="ButtonConnect_Click" HorizontalAlignment="Right" Margin="0,15,20,-2"/>
+    </StackPanel>
+</Window>

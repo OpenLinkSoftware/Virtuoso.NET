@@ -1,0 +1,40 @@
+﻿<Window x:Class="AdoNetDemo.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:AdoNetDemo"
+        mc:Ignorable="d"
+        Title="ADO.NET Demo" Height="500" Width="800" HorizontalAlignment="Left">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="19" MinHeight="19" />
+            <RowDefinition Height="*" MinHeight="200" />
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0">
+            <Menu Height="19" VerticalAlignment="Top">
+                <MenuItem Header="File">
+                    <MenuItem Header="Exit" Click="MenuExit_Click"/>
+                </MenuItem>
+                <MenuItem Header="Environment">
+                    <MenuItem Name="mnOpen" Header="Open Connection..." Click="MenuOpen_Click"/>
+                    <MenuItem Name="mnClose" Header="Close Connection..." Click="MenuClose_Click"/>
+                </MenuItem>
+                <MenuItem Header="SQL">
+                    <MenuItem Name="mnSQL" Header="Execute SQL..." Click="MenuExecute_Click"/>
+                </MenuItem>
+<!--                
+                <MenuItem Header="Help">
+                    <MenuItem Header="About Demo" Click="MenuAbout_Click"/>
+                </MenuItem>
+-->                
+            </Menu>
+        </Grid>
+        <Grid Grid.Row="1">
+            <ListView Name="lvData" SelectionMode="Single" Margin="0,0,0,0" VirtualizingPanel.VirtualizationMode="Recycling">
+            </ListView>
+
+        </Grid>
+
+    </Grid>
+</Window>
